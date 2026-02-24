@@ -3,30 +3,44 @@
 #include <stdarg.h>
 
 /**
- * print_strings - prints strings separated by a given string
- * @separator: string to print between elements
- * @n: number of strings passed
+ * print_all - prints anything
+ * @format: list of argument types
  *
- * Description: Prints (nil) for NULL strings.
- * If separator is NULL, it is not printed.
+ * Description: c = char, i = int, f = float, s = char *.
+ * If string is NULL, prints (nil).
  * Prints a new line at the end.
  */
-void print_strings(const char *separator, const unsigned int n, ...)
+void print_all(const char * const format, ...)
 {
 	va_list args;
 	unsigned int i = 0;
 	char *str;
 	char *sep = "";
+	char c;
 
-	va_start(args, n);
+	va_start(args, format);
 
-	while (i < n)
+	while (format && format[i])
 	{
-		str = va_arg(args, char *);
-		if (str == NULL)
-			str = "(nil)";
-		printf("%s%s", sep, str);
-		sep = separator != NULL ? (char *)separator : "";
+		c = format[i];
+		if (c == 'c' || c == 'i' || c == 'f' || c == 's')
+		{
+			printf("%s", sep);
+			if (c == 'c')
+				printf("%c", va_arg(args, int));
+			if (c == 'i')
+				printf("%d", va_arg(args, int));
+			if (c == 'f')
+				printf("%f", va_arg(args, double));
+			if (c == 's')
+			{
+				str = va_arg(args, char *);
+				if (!str)
+					str = "(nil)";
+				printf("%s", str);
+			}
+			sep = ", ";
+		}
 		i++;
 	}
 
