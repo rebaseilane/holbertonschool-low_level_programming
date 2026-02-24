@@ -2,6 +2,15 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+/**
+ * print_strings - prints strings separated by a string
+ * @separator: string to print between each string
+ * @n: number of strings passed to the function
+ *
+ * Description: If separator is NULL, it is not printed. 
+ * If a string is NULL, "(nil)" is printed instead. 
+ * Prints a new line at the end.
+ */
 void print_strings(const char *separator, const unsigned int n, ...)
 {
 	unsigned int i;

@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+/**
+ * print_numbers - prints numbers separated by a string
+ * @separator: string to print between numbers
+ * @n: number of integers passed to the function
+ *
+ * Description: If separator is NULL, it is not printed. 
+ * Prints a new line at the end.
+ */
 void print_numbers(const char *separator, const unsigned int n, ...)
 {
 	unsigned int i;
