@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#define BUF_SIZE 1024
+
 /**
  * error_exit_str - Prints an error message with a string argument and exits
  * @code: Exit code
@@ -29,6 +31,47 @@ void error_exit_int(int code, char *msg, int arg)
 }
 
 /**
+ * copy_file - Copies content from one file to another
+ * @fd_from: File descriptor of the source file
+ * @fd_to: File descriptor of the destination file
+ * @fname_from: Name of the source file (for error messages)
+ * @fname_to: Name of the destination file (for error messages)
+ */
+void copy_file(int fd_from, int fd_to, char *fname_from, char *fname_to)
+{
+	ssize_t r_bytes, w_bytes;
+	char buffer[BUF_SIZE];
+
+	while ((r_bytes = read(fd_from, buffer, BUF_SIZE)) > 0)
+	{
+		w_bytes = write(fd_to, buffer, r_bytes);
+		if (w_bytes != r_bytes)
+		{
+			close(fd_from);
+			close(fd_to);
+			error_exit_str(99, "Error: Can't write to %s\n", fname_to);
+		}
+	}
+
+	if (r_bytes == -1)
+	{
+		close(fd_from);
+		close(fd_to);
+		error_exit_str(98, "Error: Can't read from file %s\n", fname_from);
+	}
+}
+
+/**
+ * close_fd - Closes a file descriptor and checks for errors
+ * @fd: File descriptor to close
+ */
+void close_fd(int fd)
+{
+	if (close(fd) == -1)
+		error_exit_int(100, "Error: Can't close fd %d\n", fd);
+}
+
+/**
  * main - Copies the content of a file to another file
  * @ac: Number of arguments
  * @av: Array of arguments
@@ -41,8 +84,7 @@ void error_exit_int(int code, char *msg, int arg)
  */
 int main(int ac, char **av)
 {
-	int fd_from, fd_to, r_bytes, w_bytes;
-	char buffer[1024];
+	int fd_from, fd_to;
 
 	if (ac != 3)
 	{
@@ -61,28 +103,10 @@ int main(int ac, char **av)
 		error_exit_str(99, "Error: Can't write to %s\n", av[2]);
 	}
 
-	while ((r_bytes = read(fd_from, buffer, 1024)) > 0)
-	{
-		w_bytes = write(fd_to, buffer, r_bytes);
-		if (w_bytes != r_bytes)
-		{
-			close(fd_from);
-			close(fd_to);
-			error_exit_str(99, "Error: Can't write to %s\n", av[2]);
-		}
-	}
+	copy_file(fd_from, fd_to, av[1], av[2]);
 
-	if (r_bytes == -1)
-	{
-		close(fd_from);
-		close(fd_to);
-		error_exit_str(98, "Error: Can't read from file %s\n", av[1]);
-	}
-
-	if (close(fd_from) == -1)
-		error_exit_int(100, "Error: Can't close fd %d\n", fd_from);
-	if (close(fd_to) == -1)
-		error_exit_int(100, "Error: Can't close fd %d\n", fd_to);
+	close_fd(fd_from);
+	close_fd(fd_to);
 
 	return (0);
 }
